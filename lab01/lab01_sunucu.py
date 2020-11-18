@@ -3,59 +3,78 @@ import socket
 import random
 from _thread import *
 import threading
-from datetime import datetime
 
 def threaded(conn):
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("Current time is ",current_time)
+
+    print("Sayi bulmaca oyununa hosgeldiniz!\n")
+
     while True:
         mess = conn.recv(1024).decode()
         mess_stripped = mess.strip()
-        if len(mess_stripped) > 3:
-            mess1 = mess.split(" ")
-            command = str(mess1[0]).strip()
-            number = str(mess1[1]).strip()
-            if command == "TRY" and number.isdigit():
+
+        mess1 = mess.split(" ")
+        if len(mess1) > 1:
+            command1 = str(mess1[0]).strip()
+            number1 = str(mess1[1]).strip()
+            if command1 == "TRY" and number1.isdigit():
                 conn.send("GRR\n".encode())
+            else:
+                conn.send("ERR\n".encode())
+                
+        else:    
+            if mess_stripped != "QUI" and mess_stripped != "TIC" and mess_stripped != "STA":
+                conn.send("ERR\n".encode())
 
         if mess_stripped == "TIC":
             conn.send("TOC\n".encode())
         if mess_stripped == "QUI":
             conn.send("BYE\n".encode())
-            conn.close()
+            #conn.close()
             break
 
         if mess_stripped == "STA":
-            n = random.randint(0, 100)
-            print(n)
+            n = random.randint(1, 99)
+            #print(n)
             conn.send("RDY\n".encode())
-            while True:
+            while True:                                         #oyuna baslangic
                 data = str(conn.recv(1024).decode())
                 data_stripped = data.strip()
                 tahmin = data.split(" ")
-                if len(data_stripped) < 4:
+
+                if len(tahmin) < 2:
                     if data_stripped == "TIC":
                         conn.send("TOC\n".encode())
-                    if data_stripped == "QUI":
+                    elif data_stripped == "QUI":
                         conn.send("BYE\n".encode())
                         conn.close()
                         break
-                if len(data_stripped) > 4:
-                    sayi = int(tahmin[1])
-                    #if sayi is not int
-                        #conn.send("PRR".encode())
-                    if sayi > n:
-                        conn.send("GTH\n".encode())
-                    if sayi < n:
-                        conn.send("LTH\n".encode())          
-                    if sayi == n:
-                        conn.send("WIN\n".encode())
-                        conn.close()
-                        break
-                    #if data == "STA":
-                
-
+                    elif data_stripped == "STA":
+                        n = random.randint(1,99)
+                        conn.send("RDY\n".encode())
+                        #print(n)
+                    else:
+                        conn.send("ERR\n".encode())
+                    
+                elif len(tahmin) == 2:
+                    if tahmin[0].strip() == "TRY" and tahmin[1].strip().isdigit():
+                        sayi = int(tahmin[1])
+                        if sayi > n:
+                            conn.send("GTH\n".encode())
+                        if sayi < n:
+                            conn.send("LTH\n".encode())          
+                        if sayi == n:
+                            conn.send("WIN\n".encode())
+                            #conn.close()
+                            break
+                    elif False == (tahmin[1].strip().isdigit()) and tahmin[0].strip() == "TRY":
+                        conn.send("PRR\n".encode())
+                    else:
+                        conn.send("ERR\n".encode())
+                else:
+                        conn.send("ERR\n".encode())
+            break
+    conn.close()
+           
 server_socket = socket.socket()
 
 host = "0.0.0.0"
