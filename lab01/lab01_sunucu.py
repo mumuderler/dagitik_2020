@@ -1,8 +1,14 @@
 import sys
 import socket
 import random
+from _thread import *
+import threading
+from datetime import datetime
 
-def start_game(conn):
+def threaded(conn):
+    now = datetime.now()
+    current_time = now.strftime("%H:%M:%S")
+    print("Current time is ",current_time)
     while True:
         mess = conn.recv(1024).decode()
         mess_stripped = mess.strip()
@@ -45,9 +51,10 @@ def start_game(conn):
                         conn.send("LTH\n".encode())          
                     if sayi == n:
                         conn.send("WIN\n".encode())
+                        conn.close()
                         break
                     #if data == "STA":
-            conn.close()
+                
 
 server_socket = socket.socket()
 
@@ -66,6 +73,6 @@ while True:
 
     print("Connected to :", addr[0],":",addr[1])
 
-    start_game(c,)
+    start_new_thread(threaded, (c,))
 
 server_socket.close()
