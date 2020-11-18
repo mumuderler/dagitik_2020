@@ -47,7 +47,7 @@ def start_game(conn):
                         conn.send("WIN\n".encode())
                         break
                     #if data == "STA":
-        conn.close()
+            conn.close()
 
 server_socket = socket.socket()
 
