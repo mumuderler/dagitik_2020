@@ -1,0 +1,125 @@
+import socket
+import threading
+import queue
+
+class rThread(threading.Thread):
+    def __init__(self, name, connection, queue):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.connection = connection
+        self.queue = queue
+
+    def run(self):
+        self.flag = False
+        self.flag2 = False
+        self.quit = False
+        print(self.name, "Starting.")
+        while True:
+            if self.quit == True:
+                break          
+            data = self.connection.recv(1024)
+            strip = (data.decode()).strip()
+            self.incoming_parser(data.decode())
+
+            if strip == "QUI":
+                self.quit = True 
+
+        print(self.name, "Exiting.")
+        self.connection.close()
+
+    def incoming_parser(self, data):
+        msg = data.strip().split(" ")
+        print("Kullanıcı:", msg)
+        if msg[0] == "":
+            pass
+
+        elif msg[0] == "NIC" and len(msg) == 2 and self.flag2 == False:
+            if msg[1] in sozluk:
+                self.queue.put("REJ\n")
+            else:
+                self.queue.put("WEL\n")
+                sozluk[msg[1]] = self.queue
+                self.name = msg[1]
+                self.flag = True
+                self.flag2 = True
+        elif msg[0] == "QUI" and len(msg) == 1:
+            self.queue.put("BYE "+self.name+"\n")
+            if self.flag == True:
+                sozluk.pop(self.name)
+        elif msg[0] == "PIN" and len(msg) == 1:
+            self.queue.put("PON\n")
+   
+        elif self.flag == True and (msg[0] == "GLS" or msg[0] == "GNL" or msg[0] == "PRV"):
+            if msg[0] == "GLS" and len(msg) == 1:
+                str1 = ":"
+                str1 = str1.join(sozluk.keys())
+                self.queue.put("LST "+str1+"\n")      
+
+            elif msg[0] == "GNL":
+                self.queue.put("OKG\n")
+                str1 = " "
+                str1 = str1.join(msg[1:])
+
+                for client in sozluk:
+                    sozluk[client].put(self.name+":"+str1+"\n")
+
+            elif msg[0] == "PRV" and len(msg) == 2:
+                data = str(msg[1]).split(":")
+                receiver = data[0]
+                mesaj = data[1]
+
+                if receiver not in sozluk:
+                    self.queue.put("NOP "+receiver+"\n")
+                else:
+                    self.queue.put("OKP\n")
+                    sozluk[receiver].put(self.name+":"+mesaj+"\n")
+            else:
+                self.queue.put("ERR\n")
+            
+        elif self.flag == False and (msg[0] == "GLS" or msg[0] == "GNL" or msg[0] == "PRV"):
+            self.queue.put("LRR\n")
+
+        else:
+            self.queue.put("ERR\n") 
+
+class wThread(threading.Thread):
+    def __init__(self, name, connection, queue):
+        threading.Thread.__init__(self)
+        self.connection = connection
+        self.queue = queue
+        self.name = name
+
+    def run(self):
+        self.quit = False
+        print(self.name, "Starting.")
+        while True:     
+            data = self.queue.get()
+            splitted = data.split(" ")
+            if splitted[0] == "BYE":
+                self.quit = True
+            print("Istemci", data)
+            self.connection.send(data.encode())
+
+        print(self.name, "Exiting.")
+
+server_socket = socket.socket()
+
+host = "0.0.0.0"
+port = 12345
+server_socket.bind((host, port))
+print("socket binded to port", port)
+server_socket.listen(5)
+print("socket is listening")
+
+sozluk = {}
+
+while True:
+    conn_socket, addr = server_socket.accept()
+    print("Connected to :", addr[0],":",addr[1])
+
+    queue1 = queue.Queue(10)
+    readThread = rThread("Read Thread", conn_socket, queue1)
+    writeThread = wThread("Write Thread", conn_socket, queue1)
+
+    readThread.start()
+    writeThread.start()
