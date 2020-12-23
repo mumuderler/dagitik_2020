@@ -1,0 +1,51 @@
+2020-12-23 03:53:11.579283 Read Thread Starting.
+2020-12-23 03:53:13.595721 Read Thread Starting.
+2020-12-23 03:53:15.171547 Read Thread Starting.
+2020-12-23 03:53:30.346080 Read Thread: NIC emir
+2020-12-23 03:53:30.346148 Sunucu: WEL
+2020-12-23 03:53:30.346166 WRN: emir Kullanıcısı gruba katıldı.
+2020-12-23 03:53:33.185996 Read Thread: NIC emir
+2020-12-23 03:53:33.186170 Sunucu: REJ
+2020-12-23 03:53:34.761707 Read Thread: NIC ece
+2020-12-23 03:53:34.761818 Sunucu: WEL
+2020-12-23 03:53:34.761940 WRN: ece Kullanıcısı gruba katıldı.
+2020-12-23 03:53:36.010154 ece: GLS
+2020-12-23 03:53:36.010272 Sunucu: LST emir:ece
+2020-12-23 03:53:38.898065 Read Thread: NIC fatih
+2020-12-23 03:53:38.898140 Sunucu: WEL
+2020-12-23 03:53:38.898157 WRN: fatih Kullanıcısı gruba katıldı.
+2020-12-23 03:53:42.969698 emir: GLS
+2020-12-23 03:53:42.969784 Sunucu: LST emir:ece:fatih
+2020-12-23 03:53:44.257964 emir: sdlksalk
+2020-12-23 03:53:44.258078 Sunucu: ERR
+2020-12-23 03:53:49.377376 ece: GNL nasılsınız arkadaslar
+2020-12-23 03:53:49.377511 Sunucu: OKG
+2020-12-23 03:53:49.377608 Sunucu: ece:nasılsınız arkadaslar
+2020-12-23 03:53:49.377711 Sunucu: ece:nasılsınız arkadaslar
+2020-12-23 03:53:49.377772 Sunucu: ece:nasılsınız arkadaslar
+2020-12-23 03:53:59.673537 fatih: PRV ece:iyiyim sen nasılsın ece
+2020-12-23 03:53:59.673589 Sunucu: OKP
+2020-12-23 03:53:59.673601 Sunucu: fatih:ece ece:iyiyim sen nasılsın ece
+2020-12-23 03:54:04.745539 ece: PIN
+2020-12-23 03:54:04.745689 Sunucu: PON
+2020-12-23 03:54:06.793593 fatih: TI
+2020-12-23 03:54:06.793696 Sunucu: ERR
+2020-12-23 03:54:08.121326 fatih: TIN
+2020-12-23 03:54:08.121410 Sunucu: TON
+2020-12-23 03:54:10.553142 emir: OKW
+2020-12-23 03:54:10.553204 Sunucu: OKW
+2020-12-23 03:54:13.761211 emir: GLS
+2020-12-23 03:54:13.761361 Sunucu: LST emir:ece:fatih
+2020-12-23 03:54:16.953696 ece: QUI
+2020-12-23 03:54:16.953881 Sunucu: BYE ece
+2020-12-23 03:54:16.954148 ece Exiting.
+2020-12-23 03:54:21.649426 fatih: GLS
+2020-12-23 03:54:21.649568 Sunucu: LST emir:fatih
+2020-12-23 03:54:23.233562 fatih: QUI
+2020-12-23 03:54:23.233676 Sunucu: BYE fatih
+2020-12-23 03:54:23.233814 fatih Exiting.
+2020-12-23 03:54:27.201499 emir: PIN
+2020-12-23 03:54:27.201592 Sunucu: PON
+2020-12-23 03:54:28.377973 emir: QUI
+2020-12-23 03:54:28.378045 Sunucu: BYE emir
+2020-12-23 03:54:28.378065 emir Exiting.
