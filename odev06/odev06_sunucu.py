@@ -28,18 +28,13 @@ class rThread(threading.Thread):
         self.queue = queue
         self.quits = quits
         self.loggerQueue = loggerQueue
-
+        self.flag = False           #NIC yazmadan önce GLS PRV GNL'nin kullanımını engellemek icin
+        self.flag2 = False          #aynı isimdi kullanıcı kaydını engllemek içins
     def run(self):
-        self.flag = False
-        self.flag2 = False
+
         print(self.name, "Starting.")
         self.loggerQueue.put(self.name + " Starting.\n")
         while True:
-            if self.quits == True:
-                print(self.name, "Exiting.")
-                self.loggerQueue.put(self.name + " Exiting.\n")
-                self.connection.close()
-                break         
             data = self.connection.recv(1024)
 
             strip = (data.decode()).strip()
@@ -47,15 +42,23 @@ class rThread(threading.Thread):
 
             self.incoming_parser(data.decode())
 
+            if not data and self.flag2 == True: #client rumuz aldıktan sonra QUI yazmazdan çıkarsa
+                sozluk.pop(self.name)
+                self.connection.close()
+                break
+            if not data and self.flag2 == False:
+                self.connection.close()
+                break
             if strip == "QUI":
-                self.quits = True 
-
+                print(self.name, "Exiting.")
+                self.loggerQueue.put(self.name + " Exiting.\n")
 
         #self.connection.close()
 
     def incoming_parser(self, data):
         msg = data.strip().split(" ")
-        print("Kullanıcı:", msg)
+        print("Client:", msg)
+
         if msg[0] == "":
             pass
 
@@ -84,6 +87,9 @@ class rThread(threading.Thread):
 
             if self.flag == True:
                 sozluk.pop(self.name)
+                self.flag = False
+                self.flag2 = False
+                #self.name = "Read Thread"
 
         elif msg[0] == "PIN" and len(msg) == 1:
             self.queue.put("PON\n")
@@ -171,8 +177,6 @@ class wThread(threading.Thread):
             print("Istemci", data)
             if self.quits == True:
                 print(self.name, "Exiting.")
-                #self.connection.close()
-                break                
 
 server_socket = socket.socket()
 
