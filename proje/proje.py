@@ -336,8 +336,8 @@ class rThread(threading.Thread):
                         if key == self.name and room in val:
                             value = True
                             for client in rooms[room]:
-                                lobby[client].put("The room "+room+" has been closed.\n")
-                            self.loggerQueue.put("The room "+room+" has been closed.\n")                                                    
+                                lobby[client].put("OKK The room "+room+" has been closed.\n")
+                            self.loggerQueue.put("OKK The room "+room+" has been closed.\n")                                                    
                             for user in lobby:
                                 if room in uye[user]:
                                     uye[user].remove(room)
