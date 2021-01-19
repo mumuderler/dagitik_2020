@@ -433,7 +433,8 @@ class rThread(threading.Thread):
                 self.queue.put("ERR\n")
                 self.loggerQueue.put("Sunucu: "+"ERR\n")
                 
-        elif self.flag == False and (msg[0] == "GLS" or msg[0] == "GNL" or msg[0] == "PRV"):
+        elif self.flag == False and (msg[0] == "GLS" or msg[0] == "GNL" or msg[0] == "PRV"  or msg[0] == "OKW" or msg[0] == "OKP" or msg[0] == "OKG" or msg[0] == "TIN" or msg[0] =="OPG"
+        or msg[0] == "SHW" or msg[0] =="ENT" or msg[0] == "EXI" or msg[0] == "WHR" or msg[0] == "KCK" or msg[0] == "CLO" or msg[0] == "BAN" or msg[0] == "PRO"):
             self.queue.put("LRR\n")
             self.loggerQueue.put("Sunucu: "+"LRR\n")
 
