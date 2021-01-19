@@ -125,16 +125,27 @@ class rThread(threading.Thread):
             for client in lobby:
                 lobby[client].put("User named "+self.name+" has left the group.\n")
             self.loggerQueue.put(("User named "+self.name+" has left the group.\n"))
+            for key,val in rooms.items():
+                if self.name in val:
+                    rooms[key].remove(self.name)
+
+            for key,val in uye.items():
+                if self.name in key:
+                    uye[self.name] = []
+                  
+            for key,val in yonetici.items():
+                if self.name in key:
+                    yonetici[self.name] = []
+
             if self.flag == True:
                 lobby.pop(self.name)
                 self.flag = False
                 self.flag2 = False
-                #self.name = "Read Thread"
 
         elif msg[0] == "PIN" and len(msg) == 1:
             self.queue.put("PON\n")
             self.loggerQueue.put("Sunucu: "+"PON\n")
-            
+
         elif self.flag == True and (msg[0] == "GLS" or msg[0] == "GNL" or msg[0] == "PRV"  or msg[0] == "OKW" or msg[0] == "OKP" or msg[0] == "OKG" or msg[0] == "TIN" or msg[0] =="OPG"
         or msg[0] == "SHW" or msg[0] =="ENT" or msg[0] == "EXI" or msg[0] == "WHR" or msg[0] == "KCK" or msg[0] == "CLO" or msg[0] == "BAN" or msg[0] == "PRO"):
             if msg[0] == "GLS" and len(msg) == 2:                           
@@ -155,8 +166,15 @@ class rThread(threading.Thread):
                         self.queue.put("NOU\n")
                         self.loggerQueue.put("NOU\n")
                     else:                                                           #show users in the room
+                        user_list_in_room = []
+                        for key,val in yonetici.items():
+                            if room in val:
+                                user_list_in_room.append(key+"(yonetici)")
+                        for key,val in uye.items():
+                            if room in val:
+                                user_list_in_room.append(key+"(kullanıcı)")                                
                         str1 = ":"
-                        str1 = str1.join(rooms[room])
+                        str1 = str1.join(user_list_in_room)
                         self.queue.put("LST "+str1+"\n")
                         self.loggerQueue.put("Sunucu: "+"LST "+str1+"\n")
 
@@ -192,8 +210,8 @@ class rThread(threading.Thread):
                     self.queue.put("OKP\n")
                     self.loggerQueue.put("Sunucu: "+"OKP\n")
                     
-                    lobby[receiver].put(self.name+":"+message+"\n")
-                    self.loggerQueue.put("Sunucu: "+self.name+":"+receiver+" "+message+"\n")
+                    lobby[receiver].put(self.name+": "+message+"\n")
+                    self.loggerQueue.put("Sunucu: "+self.name+": "+receiver+" "+message+"\n")
 
             elif msg[0] == "OKW":
                 print("OKW")
@@ -223,7 +241,6 @@ class rThread(threading.Thread):
                     self.loggerQueue.put("WEC\n")
                     rooms[room].append(self.name)                                 #add user to the room
                     yonetici[self.name].append(room)                              #add user to the yoneticiler dictionary
-                    print(yonetici)
             elif msg[0] == "SHW":
                 if rooms:                                                         #show rooms
                     str1 = ":"
@@ -231,7 +248,7 @@ class rThread(threading.Thread):
                     self.queue.put("LST: "+str1+"\n")
                     self.loggerQueue.put("Sunucu: "+"LST: "+str1+"\n") 
                 else:
-                    self.queue.put("NOO\n")                                       #user not in any room
+                    self.queue.put("NOO\n")                                       #no rooms found
                     self.loggerQueue.put("NOO\n") 
 
             elif msg[0] == "ENT":
@@ -253,17 +270,22 @@ class rThread(threading.Thread):
                     self.queue.put("NOO\n")                                       #no rooms                     
                     self.loggerQueue.put("NOO\n") 
 
-            elif msg[0] == "EXI":
+            elif msg[0] == "EXI" and len(msg) == 2:
                 room = msg[1]
-                if room in rooms and room in uye[self.name]:                    #exit room #list #.values()
-                    rooms[room].remove(self.name)
-                    uye[self.name].remove(room)
+                if room in rooms and (room in uye[self.name] or room in yonetici[self.name]):                    
+                    if self.name in uye.keys() and uye[self.name]:
+                        uye[self.name].remove(room)
+                    if self.name in yonetici.keys() and yonetici[self.name]:
+                        yonetici[self.name].remove(room)
+                    
                     self.queue.put("BYE\n")
                     self.loggerQueue.put("BYE\n")    
 
                     self.loggerQueue.put("ONG: "+self.name+" Kullanıcısı odadan çıktı.\n")
                     for client in rooms[room]:
-                        lobby[client].put("ONG: "+self.name+" Kullanıcısı odadan çıktı.\n")                
+                        lobby[client].put("ONG: "+self.name+" Kullanıcısı odadan çıktı.\n")
+                    rooms[room].remove(self.name)
+                
                 if room not in rooms:                                             #room not exists
                     self.queue.put("ONE\n")
                     self.loggerQueue.put("ONE\n")
@@ -284,7 +306,7 @@ class rThread(threading.Thread):
                         for key,val in yonetici.items():
                             if key == self.name and room in val:                #user kicked from the room
                                 rooms[room].remove(user)
-                                if user in uye[user]:
+                                if user in uye.keys():
                                     uye[user].remove(room)
                                 else:
                                     yonetici[user].remove(room)     
@@ -319,11 +341,13 @@ class rThread(threading.Thread):
                             for user in lobby:
                                 if room in uye[user]:
                                     uye[user].remove(room)
+                                if room in yonetici[user]:
+                                    yonetici[user].remove(room)
                             rooms.pop(room)
                             self.queue.put("OKS "+msg[1]+"\n")
                             self.loggerQueue.put("OKS "+msg[1]+"\n")
                     
-                    if value == True:
+                    if value == False:
                         self.queue.put("YET\n")
                         self.loggerQueue.put("YET\n")                    
             
@@ -342,16 +366,20 @@ class rThread(threading.Thread):
                         if key == self.name and room in val:                #user banned from the room
                             banned[user].append(room)
                             self.queue.put("BND\n")
-                            self.loggerQueue.put("BND\n")    
-                            lobby[user].put("You have been banned from the room "+room+"\n")
-                            self.loggerQueue.put("You have been banned from the room "+room+"\n")              
+                            self.loggerQueue.put("BND\n")
+                            if user in lobby.keys():    
+                                lobby[user].put("BED You have been banned from the room "+room+"\n")
+                                self.loggerQueue.put("BED You have been banned from the room "+room+"\n")     
+                                value = True
+     
                             users_in_room = rooms[room]
                             if user in users_in_room:
                                 rooms[room].remove(user)
                                 uye[user].remove(room)                          
                                 self.queue.put("KCD\n")
                                 self.loggerQueue.put("KCD\n")  
-                                value = True
+                                lobby[user].put("KLK You have been kicked from "+room+"\n")
+                                self.loggerQueue.put("KLK You have been kicked from "+room+"\n")    
                     if value == False:
                         self.queue.put("YET\n")
                         self.loggerQueue.put("YET\n")  
@@ -374,8 +402,8 @@ class rThread(threading.Thread):
                     self.loggerQueue.put("LSI "+str1+"\n")
                     
                 else:                                                           #not in a room
-                    self.queue.put("NOI\n")                                     
-                    self.loggerQueue.put("NOI\n")
+                    self.queue.put("LSI\n")                                     
+                    self.loggerQueue.put("LSI\n")
 
             elif msg[0] == "PRO" and len(msg) == 3:
                 room = msg[1]
@@ -391,6 +419,7 @@ class rThread(threading.Thread):
                     for key,val in yonetici.items():                        
                         if key == self.name and room in val:                                                       
                             yonetici[user].append(room)                           #user added to yonetici dictionary
+                            uye[user].remove(room)
                             self.queue.put("PRM\n")
                             self.loggerQueue.put("PRM\n")
                             for client in rooms[room]:
