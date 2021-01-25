@@ -1,0 +1,12 @@
+SHW
+NIC torvalds 1972
+NIC torvalds 1974
+SHW
+GNL gentoo selam
+ENT gentoo
+GNL gentoo tekrar selam
+PRV tux:beni niye banladın?
+ENT ubuntu
+GLS ubuntu
+GNL ubuntu hey
+KCK ubuntu tux
