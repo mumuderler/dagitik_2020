@@ -4,6 +4,5 @@ SHW
 ENT ubuntu
 GLS ubuntu
 OPG plasma
-ENT plasma
 SHW
 CLO plasma
